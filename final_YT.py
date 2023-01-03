@@ -33,7 +33,7 @@ for item in search_response['items']:
         video_titles = (item['snippet']['title'])
         print('CI',channel_ids)
         
-for i in range(len(channel_ids)):
+        for i in range(len(channel_ids)):
             channel_Id = channel_ids[i]
             print('channel',channel_Id)
             url = f"https://www.googleapis.com/youtube/v3/search?key={api_key}&part=snippet&channelId={channel_Id}&maxResults=50"
