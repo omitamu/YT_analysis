@@ -5,35 +5,36 @@ from googleapiclient.discovery import build
 from final_YT_stats import YTstats
 import requests
 import json
+import sys
 
 #cbdsearch =[]
 
-api_key='AIzaSyCMsQyo1Z-gkeAATtj1JsrSWK8QzQH9mps' #omitamu
-#api_key='AIzaSyAzgCDQAM6faMr1nImyW8vT2QOhE4xNeNU' #moumita.aich
+#api_key='AIzaSyCMsQyo1Z-gkeAATtj1JsrSWK8QzQH9mps' #omitamu
+api_key='AIzaSyAzgCDQAM6faMr1nImyW8vT2QOhE4xNeNU' #moumita.aich
 
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 nextPageToken = None
-while True:
-    search_request = youtube.search().list(
+#while True:
+search_request = youtube.search().list(
 			part='snippet',
 			q='Fifa 2022',
 			maxResults='9',
 			pageToken=nextPageToken
-		)
+)
 
-    search_response = search_request.execute()
-    print(search_response['items'])
+search_response = search_request.execute()
+print(search_response['items'])
+#sys.exit()
     
-    for item in search_response['items']:
+for item in search_response['items']:
         channel_titles = (item['snippet']['channelTitle'])
         channel_ids = (item['snippet']['channelId'])
         video_titles = (item['snippet']['title'])
-        
         print('CI',channel_ids)
         
-        for i in range(len(channel_ids)):
-            channel_Id = channel_ids #[i]
+for i in range(len(channel_ids)):
+            channel_Id = channel_ids[i]
             print('channel',channel_Id)
             url = f"https://www.googleapis.com/youtube/v3/search?key={api_key}&part=snippet&channelId={channel_Id}&maxResults=50"
             print(url)
@@ -62,8 +63,22 @@ while True:
                 #dislikes = data["items"][0]["statistics"]["dislikeCount"]
                 views = data["items"][0]["statistics"]["viewCount"]
                 comment_count = data["items"][0]["statistics"]['commentCount']
+                
+                #Subscriptions of the channel
                 request=youtube.subscriptions().list(part="snippet,contentDetails",channelId=channel_id)
                 subs=request.execute()
+                
+                '''
+                #Captions - warning, 200 quota
+                request = youtube.captions().download()
+                #download file
+                fh = io.FileIO(channel_id+"captions", "wb")
+
+                download = MediaIoBaseDownload(fh, request)
+                complete = False
+                while not complete:
+                    status, complete = download.next_chunk()
+                '''    
             
             # channel_id = ('items'][0]['snippet']['channelId'])      
             # published_date = (['items'][0]['snippet']['publishedAt'])    
@@ -74,9 +89,9 @@ while True:
             # views = (["items"][0]["statistics"]["viewCount"])
             # comment_count = (["items"][0]["statistics"]['commentCount'])
             
-            yt = YTstats(api_key, channel_Id)
-            yt.extract_all()
-            yt.dump()
+yt = YTstats(api_key, channel_Id)
+yt.extract_all()
+yt.dump()
             
         
         #element_info = {
